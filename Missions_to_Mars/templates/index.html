@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web-Scraping</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="static/css/style.css">
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}"> -->
+</head>
+
+<body class="text-center">
+  
+    <div class="jumbotron">
+      <h1>Welcome to Mars</h1>
+      <a type="button" href="/scrape" role="button" class="btn btn-primary">Scrape New Data</a> 
+    </div>
+
+    {% if mars %}
+      <div>
+        <h2>Latest Mars News:</h2>
+        <h5>{{ mars.title }}</h5>
+        <p>{{ mars.paragraph }}</p>
+      </div>
+      
+      <div>
+        <h2 >Featured NASA Image:</h2>
+        <img title="Featured NASA Image" src="{{ mars.image }}">
+      </div>
+
+      <div>
+        <h2>Mars Facts</h2>
+        {{ mars.table|safe }}
+      </div>
+
+      <!-- Custom CSS grid test: -->
+      <!-- Test to see if grid-container CSS is being applied, it does not -->
+      <!-- Body center styling overriding grid-container?  -->
+      <div class="grid-container">
+        <div class="grid-item">1</div>
+        <div class="grid-item">2</div>
+        <div class="grid-item">3</div>
+        <div class="grid-item">4</div>
+      </div>
+      
+      <!-- Bootstrap grid test: -->
+      <!-- Why is this working while the grid does not? -->
+      <!-- Tried using this format to manually arrange hemisphere images, still only got one column -->
+      <div class="container">
+        <div class="row">
+          <div class="col">
+            1
+          </div>
+          <div class="col">
+            2
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-container">
+        
+        {% for hemisphere in mars.hemispheres %}
+          <div class="grid-item">
+            <h2 >{{ hemisphere.title }}</h2>
+            <img src="{{ hemisphere.img_url }}" height="600px" width="600px">
+          </div>
+        {% endfor %}
+        
+      </div>
+
+    {% endif %}
+</body>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+</html>

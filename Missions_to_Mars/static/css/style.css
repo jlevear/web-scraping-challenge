@@ -1,0 +1,10 @@
+.dataframe {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: auto auto;
+    align-content: center;
+}
