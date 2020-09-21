@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
 # Dependencies
 from bs4 import BeautifulSoup
 from splinter import Browser
@@ -17,105 +14,92 @@ def scrape():
     # Create BeautifulSoup object; parse with 'html.parser'
     soup = BeautifulSoup(response.text, 'html.parser')
 
+    # Navigate through the page to find the latest news title and paragraph
     news_title = soup.find('div', class_='content_title').find('a').text
     news_p = soup.find('div', class_='rollover_description_inner').text
 
-    # print(news_title)
-    # print(news_p)
-
+    # Activate the chromedriver
     executable_path = {'executable_path': 'chromedriver_win32/chromedriver.exe'}
     browser = Browser('chrome', **executable_path, headless=False)
 
+    # Open the url in chrome
     url2 = 'https://www.jpl.nasa.gov/spaceimages/?search=&category=Mars'
     browser.visit(url2)
 
+    # Activate BeautifulSoup
     html = browser.html
     soup = BeautifulSoup(html, 'html.parser')
 
+    # Locate the featured image url
     find_featured_image_url = soup.find('footer').find('a').get('data-fancybox-href')
     featured_image_url = f'https://www.jpl.nasa.gov{find_featured_image_url}'
     featured_image_url
 
+    # Close the browser
+    browser.quit()
+
+    # Use pandas to read the tables in the url
     url3 = 'https://space-facts.com/mars/'
     tables = pd.read_html(url3)
+
+    # Find the relevant table 
     first_table = tables[0]
-    table_html = first_table.to_html()
+
+    # Convert the table to html
+    table_html = first_table.to_html(index=False, header=False)
     table_html
 
+    # Activate the chromedriver
     executable_path = {'executable_path': 'chromedriver_win32/chromedriver.exe'}
     browser = Browser('chrome', **executable_path, headless=False)
 
+    # Open the url in chrome
     url4 = 'https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars'
     browser.visit(url4)
 
+    # Activate BeautifulSoup
     html = browser.html
     soup = BeautifulSoup(html, 'html.parser')
 
+    # Locate the div containing the Mars hemisphere urls
     items = soup.find_all('div', class_='item')
 
+    # Create a list of the hemisphere urls using a for loop 
     url_list = []
 
     for item in items:
         url = item.find('a').get('href')
         url_list.append(url)
 
+    # Format the urls correctly
     hemisphere_url_list = ['https://astrogeology.usgs.gov' + url for url in url_list]
 
-    hemisphere_url_list
+    # Close the browser
+    browser.quit()
 
-    hemisphere1_url = hemisphere_url_list[0]
-    browser.visit(hemisphere1_url)
+    # Activate the chromedriver
+    executable_path = {'executable_path': 'chromedriver_win32/chromedriver.exe'}
+    browser = Browser('chrome', **executable_path, headless=False)
 
-    html = browser.html
-    soup = BeautifulSoup(html, 'html.parser')
+    # Create a list of dictionaries for the hemisphere titles and image urls using a for loop 
+    hemisphere_image_urls = []
 
-    hemisphere1_image = soup.find('div', class_='downloads').find('ul').find('li').find('a').get('href')
-    # print(hemisphere1_image)
-    hemisphere1_title = soup.find('div', class_='content').find('h2').text
-    # print(hemisphere1_title)
+    for url in hemisphere_url_list:
+   
+        browser.visit(url)
 
-    hemisphere2_url = hemisphere_url_list[1]
-    browser.visit(hemisphere2_url)
+        html = browser.html
+        soup = BeautifulSoup(html, 'html.parser')
 
-    html = browser.html
-    soup = BeautifulSoup(html, 'html.parser')
-
-    hemisphere2_image = soup.find('div', class_='downloads').find('ul').find('li').find('a').get('href')
-    # print(hemisphere2_image)
-    hemisphere2_title = soup.find('div', class_='content').find('h2').text
-    # print(hemisphere2_title)
-
-    hemisphere3_url = hemisphere_url_list[2]
-    browser.visit(hemisphere3_url)
-
-    html = browser.html
-    soup = BeautifulSoup(html, 'html.parser')
-
-    hemisphere3_image = soup.find('div', class_='downloads').find('ul').find('li').find('a').get('href')
-    # print(hemisphere3_image)
-    hemisphere3_title = soup.find('div', class_='content').find('h2').text
-    # print(hemisphere3_title)
-
-    hemisphere4_url = hemisphere_url_list[3]
-    browser.visit(hemisphere4_url)
-
-    html = browser.html
-    soup = BeautifulSoup(html, 'html.parser')
-
-    hemisphere4_image = soup.find('div', class_='downloads').find('ul').find('li').find('a').get('href')
-    # print(hemisphere4_image)
-    hemisphere4_title = soup.find('div', class_='content').find('h2').text
-    # print(hemisphere4_title)
-
+        hemisphere_title = soup.find('div', class_='content').find('h2').text
+        hemisphere_image = soup.find('div', class_='downloads').find('ul').find('li').find('a').get('href')
     
+        hemisphere_image_urls.append({"title": hemisphere_title, "image": hemisphere_image})
 
-    hemisphere_image_urls = [
-        {"title": hemisphere1_title, "img_url": hemisphere1_image},
-        {"title": hemisphere2_title, "img_url": hemisphere2_image},
-        {"title": hemisphere3_title, "img_url": hemisphere3_image},
-        {"title": hemisphere4_title, "img_url": hemisphere4_image}
-    ]
+    # Close the browser
+    browser.quit()
 
+    # Create a dictionary of the items that were scraped
     mars_dictionary = {
         "title": news_title,
         "paragraph": news_p,
@@ -123,9 +107,5 @@ def scrape():
         "table": table_html,
         "hemispheres": hemisphere_image_urls
     }
-   
-    browser.quit()
-    
+       
     return mars_dictionary
-
-# print(scrape())
